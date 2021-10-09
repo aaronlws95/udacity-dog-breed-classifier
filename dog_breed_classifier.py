@@ -72,10 +72,13 @@ class DogBreedClassifierPipeline:
 
     def train(self, num_epochs, loss_fn, optimizer, device):
         self.model.to(device)
-        self.model = self.model.train()
-        running_loss = 0.0
+        train_loss = 0.0
+        min_valid_loss = 999
         for epoch in range(num_epochs):
             for i, data in enumerate(self.train_loader):
+                # Ensure model is in training mode
+                self.model = self.model.train() 
+
                 # Load data
                 img = data["img"].to(device)
                 target = data["target"].type(torch.LongTensor).to(device)
@@ -96,11 +99,11 @@ class DogBreedClassifierPipeline:
                 optimizer.step()
 
                 # Logging
-                running_loss += loss.item()
+                train_loss += loss.item()
                 n_iter = epoch * len(self.train_loader) + i
                 if n_iter % self.log_rate == 0:
-                    print('Epoch: {:5d} | Batch: {:5d} | Loss: {:03f}'.format(epoch + 1, i + 1, running_loss / self.log_rate))
-                    running_loss = 0.0
+                    print('Epoch: {:5d} | Batch: {:5d} | Training Loss: {:03f}'.format(epoch + 1, i + 1, train_loss / self.log_rate))
+                    train_loss = 0.0
 
                 # Save model
                 if n_iter % self.save_rate == 0:
@@ -111,3 +114,35 @@ class DogBreedClassifierPipeline:
                     }
                     timestamp = datetime.now().strftime("%Y_%m_%d_%H%M%S%f")
                     torch.save(model_save_info, str(self.save_path / 'model_{}_{:05d}.pth'.format(timestamp, n_iter)))
+
+                # Validate model 
+                if n_iter % self.valid_rate == 0:
+                    valid_loss = 0.0
+                    # Ensure model is in evaluation mode
+                    self.model.eval()
+                    for j, data in enumerate(self.valid_loader):
+                        # Load data
+                        img = data["img"].to(device)
+                        target = data["target"].type(torch.LongTensor).to(device)     
+
+                        # Forward pass
+                        out = self.model(img)
+
+                        # Calculate loss
+                        loss = loss_fn(out, target)
+                        valid_loss += loss.item()
+
+                    valid_loss = valid_loss / len(self.valid_loader)
+
+                     # Logging
+                    print('Epoch: {:5d} | Batch: {:5d} | Validation Loss: {:03f}'.format(epoch + 1, j + 1, valid_loss))
+                                    
+                    if valid_loss < min_valid_loss:
+                        model_save_info = {
+                            'epoch': epoch,
+                            'model_state_dict': self.model.state_dict(),
+                            'optimizer_state_dict': optimizer.state_dict(),
+                        }
+                        timestamp = datetime.now().strftime("%Y_%m_%d_%H%M%S%f")                        
+                        torch.save(model_save_info, str(self.save_path / 'model_{}_{:05d}_low_valid.pth'.format(timestamp, n_iter)))
+                        min_valid_loss = valid_loss
