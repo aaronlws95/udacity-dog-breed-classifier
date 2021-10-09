@@ -7,7 +7,7 @@ from datasets import *
 
 class DogBreedClassifierPipeline:
     def __init__(
-        self, data_path, model, batch_size=20, num_workers=0, log_rate=100, save_rate=10000, valid_rate=6680, save_path="pretrained/models"
+        self, data_path, model, batch_size=20, num_workers=0, log_rate=50, save_rate=100, valid_rate=300, save_path="pretrained/models"
     ):
         # Paths
         self.data_path = Path(data_path)
@@ -16,9 +16,9 @@ class DogBreedClassifierPipeline:
 
         # Model
         self.model = model
-        
+
         # Logging frequency
-        self.log_rate = log_rate 
+        self.log_rate = log_rate
         self.save_rate = save_rate
         self.valid_rate = valid_rate
 
@@ -79,7 +79,7 @@ class DogBreedClassifierPipeline:
         for epoch in range(num_epochs):
             for i, data in enumerate(self.train_loader):
                 # Ensure model is in training mode
-                self.model = self.model.train() 
+                self.model = self.model.train()
 
                 # Load data
                 img = data["img"].to(device)
@@ -87,7 +87,7 @@ class DogBreedClassifierPipeline:
 
                 # Forward pass
                 out = self.model(img)
-    
+
                 # Zero optimizer
                 optimizer.zero_grad()
 
@@ -109,24 +109,25 @@ class DogBreedClassifierPipeline:
                     train_loss = 0.0
 
                 # Save model
-                if n_iter % self.save_rate == 0:
+                if n_iter % self.save_rate == 0 and n_iter != 0:
                     model_save_info = {
                         'epoch': epoch,
                         'model_state_dict': self.model.state_dict(),
                         'optimizer_state_dict': optimizer.state_dict(),
                     }
                     timestamp = datetime.now().strftime("%Y_%m_%d_%H%M%S%f")
+                    print("Saving model")
                     torch.save(model_save_info, str(self.save_path / 'model_{}_{:05d}.pth'.format(timestamp, n_iter)))
 
-                # Validate model 
-                if n_iter % self.valid_rate == 0:
+                # Validate model
+                if n_iter % self.valid_rate == 0 and n_iter != 0:
                     valid_loss = 0.0
                     # Ensure model is in evaluation mode
                     self.model.eval()
                     for j, data in enumerate(self.valid_loader):
                         # Load data
                         img = data["img"].to(device)
-                        target = data["target"].type(torch.LongTensor).to(device)     
+                        target = data["target"].type(torch.LongTensor).to(device)
 
                         # Forward pass
                         out = self.model(img)
@@ -138,14 +139,24 @@ class DogBreedClassifierPipeline:
                     valid_loss = valid_loss / len(self.valid_loader)
 
                      # Logging
-                    print('Epoch: {:5d} | Batch: {:5d} | Validation Loss: {:03f}'.format(epoch + 1, j + 1, valid_loss))
-                                    
+                    print('Epoch: {:5d} | Batch: {:5d} | Validation Loss: {:03f}'.format(epoch + 1, i + 1, valid_loss))
+
                     if valid_loss < min_valid_loss:
+                        print("Validation improved ({} -> {})".format(min_valid_loss, valid_loss))
                         model_save_info = {
                             'epoch': epoch,
                             'model_state_dict': self.model.state_dict(),
                             'optimizer_state_dict': optimizer.state_dict(),
                         }
-                        timestamp = datetime.now().strftime("%Y_%m_%d_%H%M%S%f")                        
+                        timestamp = datetime.now().strftime("%Y_%m_%d_%H%M%S%f")
+                        print("Saving model")
                         torch.save(model_save_info, str(self.save_path / 'model_{}_{:05d}_low_valid.pth'.format(timestamp, n_iter)))
                         min_valid_loss = valid_loss
+        print("Saving model")
+        model_save_info = {
+            'epoch': epoch,
+            'model_state_dict': self.model.state_dict(),
+            'optimizer_state_dict': optimizer.state_dict(),
+        }
+        timestamp = datetime.now().strftime("%Y_%m_%d_%H%M%S%f")
+        torch.save(model_save_info, str(self.save_path / 'model_{}_{:05d}_final.pth'.format(timestamp, n_iter)))
