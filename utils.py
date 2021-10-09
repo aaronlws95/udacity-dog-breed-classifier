@@ -5,12 +5,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import torchvision.transforms as transforms
 import torchvision.models as models
-from torch.utils.data import Dataset, DataLoader
 from pathlib import Path
-from facenet_pytorch import MTCNN, InceptionResnetV1
 
 
-def load_dog_dataset(path):
+def load_dog_dataset(path, one_hot_encoding=False):
     """
     Input:
         path (string): Path to dog dataset
@@ -23,10 +21,15 @@ def load_dog_dataset(path):
     dog_targets = [x.name for x in sorted(Path(path).glob("**/*")) if x.is_dir()]
     dog_targets_map = {x: i for i, x in enumerate(dog_targets)}
     num_classes = len(dog_targets_map.keys())
-    dog_targets = [
-        np.eye(num_classes, dtype="uint8")[i]
-        for i in [dog_targets_map[x.parent.name] for x in dog_files]
-    ]
+
+    if one_hot_encoding:
+        dog_targets = [
+            np.eye(num_classes, dtype="uint8")[i]
+            for i in [dog_targets_map[x.parent.name] for x in dog_files]
+        ]
+    else:
+        dog_targets = [dog_targets_map[x.parent.name] for x in dog_files]
+
     return dog_files, dog_targets, dog_targets_map
 
 
@@ -91,6 +94,7 @@ def load_image_imagenet(img_path, device):
     )
     img = transform(img).unsqueeze(0).to(device)
     return img
+
 
 def detect_dog_imagenet(img_path, model, device):
     img = load_image_imagenet(img_path, device)
