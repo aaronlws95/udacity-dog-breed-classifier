@@ -7,7 +7,7 @@ from datasets import *
 
 class DogBreedClassifierPipeline:
     def __init__(
-        self, data_path, model, batch_size=20, num_workers=0, log_rate=100, save_rate=10000, save_path="pretrained/models"
+        self, data_path, model, batch_size=20, num_workers=0, log_rate=100, save_rate=10000, valid_rate=6680, save_path="pretrained/models"
     ):
         # Paths
         self.data_path = Path(data_path)
@@ -16,9 +16,11 @@ class DogBreedClassifierPipeline:
 
         # Model
         self.model = model
+        
         # Logging frequency
         self.log_rate = log_rate 
         self.save_rate = save_rate
+        self.valid_rate = valid_rate
 
         _, _, self.dog_targets_map = load_dog_dataset(self.data_path / "train")
 
@@ -91,6 +93,7 @@ class DogBreedClassifierPipeline:
 
                 # Calculate loss
                 loss = loss_fn(out, target)
+                train_loss += loss.item()
 
                 # Backward pass
                 loss.backward()
@@ -98,9 +101,9 @@ class DogBreedClassifierPipeline:
                 # Optimize
                 optimizer.step()
 
-                # Logging
-                train_loss += loss.item()
                 n_iter = epoch * len(self.train_loader) + i
+
+                # Logging
                 if n_iter % self.log_rate == 0:
                     print('Epoch: {:5d} | Batch: {:5d} | Training Loss: {:03f}'.format(epoch + 1, i + 1, train_loss / self.log_rate))
                     train_loss = 0.0
