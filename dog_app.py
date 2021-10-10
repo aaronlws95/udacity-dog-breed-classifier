@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from PIL import Image
 
+
 class DogApp:
     def __init__(self, dog_breed_classifier_fn, dog_detector_fn, human_detector_fn):
         self.dog_breed_classifier_fn = dog_breed_classifier_fn
@@ -20,8 +21,10 @@ class DogApp:
             plt.show()
 
         if is_human and is_dog:
-            print("Can't tell if human or dog. Either way looks like a {}".format(breed))
-        elif is_dog: 
+            print(
+                "Can't tell if human or dog. Either way looks like a {}".format(breed)
+            )
+        elif is_dog:
             print("This is a {} dog".format(breed))
         elif is_human:
             print("Not a dog but looks like a {}".format(breed))

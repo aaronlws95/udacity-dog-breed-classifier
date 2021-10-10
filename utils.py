@@ -32,7 +32,7 @@ def load_dog_dataset(path, one_hot_encoding=False):
     else:
         dog_targets = [dog_targets_map[x.parent.name] for x in dog_files]
 
-    dog_targets_map = {i : x[4:] for x, i in dog_targets_map.items()}
+    dog_targets_map = {i: x[4:] for x, i in dog_targets_map.items()}
 
     return dog_files, dog_targets, dog_targets_map
 
