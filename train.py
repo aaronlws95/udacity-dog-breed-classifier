@@ -39,7 +39,7 @@ if __name__ == "__main__":
 
     # Setup pipeline
     dog_breed_classifier_pipeline = DogBreedClassifierPipeline(
-        data_path=args.data_path, model=model
+        data_path=args.data_path, model=model, name=args.net
     )
 
-    dog_breed_classifier_pipeline.train(num_epochs=args.num_epochs, loss_fn=loss_fn, optimizer=optimizer, device=device, name=args.net)
+    dog_breed_classifier_pipeline.train(num_epochs=args.num_epochs, loss_fn=loss_fn, optimizer=optimizer, device=device)
