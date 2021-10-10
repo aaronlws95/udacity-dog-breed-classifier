@@ -17,7 +17,7 @@ class DogBreedClassifierPipeline:
         save_rate=300,
         valid_rate=300,
         save_path="pretrained/models",
-        save_prefix="model"
+        save_prefix="model",
     ):
         # Paths
         self.data_path = Path(data_path)
@@ -93,7 +93,7 @@ class DogBreedClassifierPipeline:
         )
 
     def train(self, num_epochs, loss_fn, optimizer, device):
-        self.model.to(device)
+        self.model = self.model.to(device)
         train_loss = 0.0
         min_valid_loss = 999
         for epoch in range(self.start_epoch, num_epochs):
@@ -145,7 +145,9 @@ class DogBreedClassifierPipeline:
                         model_save_info,
                         str(
                             self.save_path
-                            / "{}_{}_{:05d}.pt".format(self.save_prefix, timestamp, n_iter)
+                            / "{}_{}_{:05d}.pt".format(
+                                self.save_prefix, timestamp, n_iter
+                            )
                         ),
                     )
 
@@ -192,7 +194,9 @@ class DogBreedClassifierPipeline:
                             model_save_info,
                             str(
                                 self.save_path
-                                / "{}_{}_{:05d}_best.pt".format(self.save_prefix, timestamp, n_iter)
+                                / "{}_{}_{:05d}_best.pt".format(
+                                    self.save_prefix, timestamp, n_iter
+                                )
                             ),
                         )
                         min_valid_loss = valid_loss
@@ -243,7 +247,9 @@ class DogBreedClassifierPipeline:
             model_save_info,
             str(
                 self.save_path
-                / "{}_{}_{:05d}{}.pt".format(self.save_prefix, timestamp, n_iter, model_save_postfix)
+                / "{}_{}_{:05d}{}.pt".format(
+                    self.save_prefix, timestamp, n_iter, model_save_postfix
+                )
             ),
         )
 
@@ -281,3 +287,23 @@ class DogBreedClassifierPipeline:
         print("Precision: {}".format(precision))
         print("Recall: {}".format(recall))
         print("Fscore: {}".format(fscore))
+
+    def load_image(self, img_path, device):
+        img = Image.open(img_path).convert("RGB")
+        transform = transforms.Compose(
+            [
+                transforms.Resize(size=(244, 244)),  # Resize
+                transforms.ToTensor(),
+                transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+            ]
+        )
+        img = transform(img).unsqueeze(0).to(device)
+        return img
+
+    def classify(self, img_path, device):
+        self.model = self.model.to(device)
+        self.model = self.model.eval()
+        img = self.load_image(img_path, device)
+        out = self.model(img)
+        pred_idx = torch.max(out, 1)[1].item()
+        return pred_idx, self.dog_targets_map[pred_idx]
