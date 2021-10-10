@@ -4,9 +4,9 @@ import PIL.Image as Image
 import numpy as np
 import matplotlib.pyplot as plt
 import torchvision.transforms as transforms
-import torchvision.models as models
 from pathlib import Path
 from PIL import ImageFile
+
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 

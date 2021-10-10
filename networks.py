@@ -1,5 +1,37 @@
 import torch.nn as nn
 
+class VGGTransferLearningNet(nn.Module):
+    def __init__(self, model, num_classes=133, freeze=True):
+        super(VGGTransferLearningNet, self).__init__()
+        self.net = model
+        self.net.classifier[6] = nn.Linear(model.classifier[6].in_features, num_classes, bias=True)
+
+        for param in self.net.parameters():
+            param.requires_grad = False
+
+        for param in self.net.classifier.parameters():
+            param.requires_grad = True
+
+    def forward(self, x):
+        x = self.net(x)
+        return x
+
+class ResNetTransferLearningNet(nn.Module):
+    def __init__(self, model, num_classes=133, freeze=True):
+        super(ResNetTransferLearningNet, self).__init__()
+        self.net = model
+        self.net.fc = nn.Linear(model.fc.in_features, num_classes, bias=True)
+
+        for param in self.net.parameters():
+            param.requires_grad = False
+
+        for param in self.net.fc.parameters():
+            param.requires_grad = True
+
+    def forward(self, x):
+        x = self.net(x)
+        return x
+
 class SimpleNet(nn.Module):
     def __init__(self, num_classes=133):
         super(SimpleNet, self).__init__()
