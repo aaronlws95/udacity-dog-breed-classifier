@@ -4,3 +4,4 @@ scikit-learn==1.0
 jupyter==1.0.0
 facenet-pytorch==2.5.2
 matplotlib==3.4.3
+opencv-python==4.5.3
