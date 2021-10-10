@@ -4,6 +4,9 @@ import argparse
 from flask import Flask, flash, request, redirect, url_for, render_template
 from werkzeug.utils import secure_filename
 from flask_dropzone import Dropzone
+from PIL import Image
+
+import matplotlib.pyplot as plt
 
 
 parser = argparse.ArgumentParser(description='Run web app')
@@ -14,11 +17,6 @@ args = parser.parse_args()
 
 app = Flask(__name__)
 dropzone = Dropzone(app)
-
-UPLOAD_FOLDER = 'static/images'
-ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
-
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 app.config.update(
     # Flask-Dropzone config:
@@ -42,18 +40,21 @@ def index():
 def test():
     return render_template('test.html')
 
-
 # web page that handles user query and displays model results
 @app.route('/go', methods = ['POST', 'GET'])
 def go():
     if request.method == 'POST':
         for key, f in request.files.items():
             if key.startswith('file'):
-                f.save(os.path.join(app.config['UPLOAD_FOLDER'], f.filename))
+                # f.save(os.path.join(app.config['UPLOAD_FOLDER'], f.filename))
+                print(f)
+                # image = Image.open(f)
+                # plt.imshow(image)
+                # plt.show()
+    result = "this is output"
 
-        return redirect(url_for("test"))  
     return render_template(
-        'go.html',
+        'go.html', result=result
     )
 
 
