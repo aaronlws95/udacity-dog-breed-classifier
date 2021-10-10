@@ -29,7 +29,6 @@ def parse_args():
     )
     return parser.parse_args()
 
-
 if __name__ == "__main__":
     # Parse arguments
     args = parse_args()
@@ -59,6 +58,7 @@ if __name__ == "__main__":
         data_path=args.data_path, model=model, save_prefix=args.net
     )
 
+    # Train
     dog_breed_classifier_pipeline.train(
         num_epochs=args.num_epochs, loss_fn=loss_fn, optimizer=optimizer, device=device
     )
