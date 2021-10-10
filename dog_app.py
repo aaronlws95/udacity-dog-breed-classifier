@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-import torchvision.transforms as transforms
 from PIL import Image
 
 class DogApp:
@@ -15,6 +14,8 @@ class DogApp:
 
         if show_img:
             img = Image.open(img_path).convert("RGB")
+            plt.yticks([])
+            plt.xticks([])
             plt.imshow(img)
             plt.show()
 

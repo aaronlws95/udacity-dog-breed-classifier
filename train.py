@@ -1,8 +1,9 @@
+import torch
 import argparse
 import torchvision.models as models
-from networks import *
-from utils import *
-from dog_breed_classifier import *
+import torch.nn as nn
+from networks import SimpleNet, VGGTransferLearningNet, ResNetTransferLearningNet
+from dog_breed_classifier import DogBreedClassifierPipeline
 
 
 def parse_args():
@@ -24,7 +25,7 @@ def parse_args():
         type=str,
         default="vgg16_tf",
         help="Select the network to use",
-        choices=["scratch, vgg16_tf, resnet50_tf"],
+        choices=["scratch", "vgg16_tf", "resnet50_tf"],
     )
     return parser.parse_args()
 

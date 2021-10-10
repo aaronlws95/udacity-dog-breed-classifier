@@ -1,9 +1,14 @@
+import torch
+import numpy as np
+import torchvision.transforms as transforms
+
 from torch.utils.data import DataLoader
 from datetime import datetime
 from sklearn.metrics import precision_recall_fscore_support
-
-from utils import *
-from datasets import *
+from pathlib import Path
+from PIL import Image
+from utils import load_dog_dataset
+from datasets import DogBreedDataset
 
 
 class DogBreedClassifierPipeline:
