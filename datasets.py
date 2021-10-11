@@ -4,7 +4,16 @@ from utils import *
 
 
 class DogBreedDataset(Dataset):
+    """
+    Dog breed dataset
+    """
     def __init__(self, path, transform):
+        """"
+        Initialize the dataset
+        Input:
+            path (string): Path to dataset
+            transform: Input data transformation
+        """
         self.img_files, self.targets, _ = load_dog_dataset(path)
         self.transform = transform
 

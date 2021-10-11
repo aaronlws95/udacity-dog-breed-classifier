@@ -12,10 +12,11 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 def load_dog_dataset(path, one_hot_encoding=False):
     """
+    Load the dog dataset
     Input:
         path (string): Path to dog dataset
     Output:
-        dog_files: Path to dog image
+        dog_files: List of paths to dog images
         dog_targets: Corresponding dog one hot encoding target
         dog_targets_map: Mapping between dog name and target index
     """
@@ -38,11 +39,26 @@ def load_dog_dataset(path, one_hot_encoding=False):
 
 
 def load_human_dataset(path):
+    """
+    Load the human dataset
+    Input:
+        path (string): Path to dataset
+    Output:
+        human_files: List of paths to human images
+    """
     human_files = [x for x in Path(path).rglob("**/*") if x.is_file()]
     return human_files
 
 
 def get_num_faces_haarcascade_PIL_img(img, detector):
+    """
+    Use Haar Cascade to get number of faces in an image
+    Input:
+        img: RGB PIL image
+        detector: Haar Cascade detector
+    Output:
+        Number of faces present in the image
+    """
     cv_img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
     gray = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
     faces = detector.detectMultiScale(gray)
@@ -50,6 +66,14 @@ def get_num_faces_haarcascade_PIL_img(img, detector):
 
 
 def get_num_faces_haarcascade(img_path, detector):
+    """
+    Use Haar Cascade to get number of faces in an image
+    Input:
+        img_path: Path to input image
+        detector: Haar Cascade detector
+    Output:
+        Number of faces present in the image
+    """
     img = cv2.imread(img_path)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     faces = detector.detectMultiScale(gray)
@@ -57,6 +81,12 @@ def get_num_faces_haarcascade(img_path, detector):
 
 
 def visualize_faces_haarcascade(img_path, detector):
+    """
+    Visualize faces obtained from Haar Cascade
+    Input:
+        img_path: Path to input image
+        detector: Haar Cascade detector
+    """
     # Load color (BGR) image
     img = cv2.imread(img_path)
     # Convert BGR image to grayscale
@@ -75,12 +105,26 @@ def visualize_faces_haarcascade(img_path, detector):
 
 
 def get_num_faces_mtcnn(img_path, detector):
+    """
+    Get number of faces in an image with MTCNN
+    Input:
+        img_path: Path to input image
+        detector: MTCNN model
+    Output:
+        Number of faces present in the image
+    """
     img = cv2.imread(img_path)
     faces = detector(img)
     return faces.shape[0] if faces is not None else 0
 
 
 def visualize_faces_mtcnn(img_path, detector):
+    """
+    Visualize faces obtained from MTCNN
+    Input:
+        img_path: Path to input image
+        detector: MTCNN model
+    """
     img = cv2.imread(img_path)
     faces = detector(img)
     for x in faces:
@@ -94,7 +138,15 @@ def visualize_faces_mtcnn(img_path, detector):
         plt.show()
 
 
-def PIL_to_tensor(img, device):
+def PIL_to_tensor_imagenet(img, device):
+    """
+    Convert PIL image to PyTorch tensor with ImageNet preprocessing
+    Input:
+        img: RGB PIL image
+        device: Name of device to use e.g. "cuda: 0" for GPU or "cpu"
+    Output:
+        img: PyTorch tensor with ImageNet preprocessing
+    """
     transform = transforms.Compose(
         [
             transforms.Resize(size=(244, 244)),  # Resize
@@ -107,12 +159,26 @@ def PIL_to_tensor(img, device):
 
 
 def detect_dog_imagenet_PIL_img(img, model, device):
-    img = PIL_to_tensor(img, device)
+    """ "
+    Classify if the given image is that of a dog
+    Input:
+        img: RGB PIL image
+        model: ML ImageNet model to classify with
+        device: Name of device to use e.g. "cuda: 0" for GPU or "cpu"
+    """
+    img = PIL_to_tensor_imagenet(img, device)
     out = model(img)
     idx = torch.max(out, 1)[1].item()
     return idx >= 151 and idx <= 268
 
 
 def detect_dog_imagenet(img_path, model, device):
+    """ "
+    Classify if the given image is that of a dog
+    Input:
+        img_path (string): Path to image
+        model: ML ImageNet model to classify with
+        device: Name of device to use e.g. "cuda: 0" for GPU or "cpu"
+    """
     img = Image.open(img_path).convert("RGB")
     return detect_dog_imagenet_PIL_img(img, model, device)

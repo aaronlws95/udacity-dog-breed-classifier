@@ -1,17 +1,20 @@
 import torch
 import numpy as np
 import torchvision.transforms as transforms
-
 from torch.utils.data import DataLoader
 from datetime import datetime
 from sklearn.metrics import precision_recall_fscore_support
 from pathlib import Path
 from PIL import Image
-from utils import load_dog_dataset, PIL_to_tensor
+from utils import load_dog_dataset, PIL_to_tensor_imagenet
 from datasets import DogBreedDataset
 
 
 class DogBreedClassifierPipeline:
+    """
+    Handle the dog breed classifier machine learning pipeline
+    """
+
     def __init__(
         self,
         data_path,
@@ -24,6 +27,19 @@ class DogBreedClassifierPipeline:
         save_path="pretrained/models",
         save_prefix="model",
     ):
+        """
+        Initialize the pipeline
+        Input:
+            data_path (string): Path to dataset
+            model: Machine learning model
+            batch_size: Number of datum for the DataLoader to batch
+            num_workers: Number of workers for the DataLoader
+            log_rate: How often to log during training (per data)
+            save_rate: How often to save checkpoints during training (per data)
+            valid_rate: How often to validate during training (per data)
+            save_path (string): Path to save model checkpoints
+            save_prefix: Prefix to identify saved model checkpoints
+        """
         # Paths
         self.data_path = Path(data_path)
         self.save_path = Path(save_path)
@@ -41,8 +57,10 @@ class DogBreedClassifierPipeline:
         self.start_epoch = 0
         self.save_prefix = save_prefix
 
+        # Get mapping from index to dog breeds
         _, _, self.dog_targets_map = load_dog_dataset(self.data_path / "train")
 
+        # Data input transformations
         self.data_transforms = {
             "train": transforms.Compose(
                 [
@@ -77,6 +95,7 @@ class DogBreedClassifierPipeline:
             ),
         }
 
+        # Load datasets
         train_dataset = DogBreedDataset(
             self.data_path / "train", self.data_transforms["train"]
         )
@@ -87,6 +106,7 @@ class DogBreedClassifierPipeline:
             self.data_path / "test", self.data_transforms["test"]
         )
 
+        # Set DataLoaders
         self.train_loader = DataLoader(
             train_dataset,
             batch_size=batch_size,
@@ -107,6 +127,14 @@ class DogBreedClassifierPipeline:
         )
 
     def train(self, num_epochs, loss_fn, optimizer, device):
+        """
+        Train the model
+        Input:
+            num_epochs: Number of epochs to train the model
+            loss_fn: Training loss function
+            optimizer: Training optimizer
+            device: Name of device to use e.g. "cuda: 0" for GPU or "cpu"
+        """
         self.model = self.model.to(device)
         train_loss = 0.0
         min_valid_loss = 999
@@ -191,6 +219,7 @@ class DogBreedClassifierPipeline:
                         )
                     )
 
+                    # Save model if validation score improves
                     if valid_loss < min_valid_loss:
                         print(
                             "Validation score improved ({} -> {})".format(
@@ -240,6 +269,7 @@ class DogBreedClassifierPipeline:
             )
         )
 
+        # Save final model
         model_save_postfix = ""
         if valid_loss < min_valid_loss:
             print(
@@ -268,12 +298,22 @@ class DogBreedClassifierPipeline:
         )
 
     def load(self, path):
+        """
+        Load pretrained model
+        Input:
+            path: Path to pretrained model
+        """
         model_save_info = torch.load(path)
         print("Loading model from checkpoint {}".format(path))
         self.start_epoch = model_save_info["epoch"] + 1
         self.model.load_state_dict(model_save_info["model_state_dict"])
 
     def evaluate(self, device):
+        """
+        Evaluate the model on the test dataset
+        Input:
+            device: Name of device to use e.g. "cuda: 0" for GPU or "cpu"
+        """
         self.model = self.model.eval()
         y_pred = []
         y_true = []
@@ -303,13 +343,30 @@ class DogBreedClassifierPipeline:
         print("Fscore: {}".format(fscore))
 
     def classify(self, img_path, device):
+        """ "
+        Classify an image using the model
+        Input:
+            img_path (string): Path to input image
+            device: Name of device to use e.g. "cuda: 0" for GPU or "cpu"
+        Output:
+            Predicted target index
+            Predicted target breed
+        """
         img = Image.open(img_path).convert("RGB")
         return self.classify_PIL_img(img, device)
 
     def classify_PIL_img(self, img, device):
+        """
+        Input:
+            img: RGB PIL Image
+            device: Name of device to use e.g. "cuda: 0" for GPU or "cpu"
+        Output:
+            pred_idx: Predicted target index
+            self.dog_targets_map[pred_idx]: Predicted target breed
+        """
         self.model = self.model.to(device)
         self.model = self.model.eval()
-        img = PIL_to_tensor(img, device)
+        img = PIL_to_tensor_imagenet(img, device)
         out = self.model(img)
         pred_idx = torch.max(out, 1)[1].item()
         return pred_idx, self.dog_targets_map[pred_idx]

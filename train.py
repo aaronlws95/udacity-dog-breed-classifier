@@ -7,6 +7,11 @@ from dog_breed_classifier import DogBreedClassifierPipeline
 
 
 def parse_args():
+    """
+    Parse arguments with argparse
+    Output:
+        Parsed arguments
+    """
     parser = argparse.ArgumentParser(description="Train a model")
     parser.add_argument(
         "--data_path", type=str, default="data/dogImages", help="Path to data"
@@ -28,6 +33,7 @@ def parse_args():
         choices=["scratch", "vgg16_tf", "resnet50_tf"],
     )
     return parser.parse_args()
+
 
 if __name__ == "__main__":
     # Parse arguments
