@@ -49,8 +49,6 @@ face_cascade = cv2.CascadeClassifier(
 human_detector_fn = lambda x: get_num_faces_haarcascade(x, face_cascade)
 dog_app = DogApp(dog_breed_classifier_fn, dog_detector_fn, human_detector_fn)
 
-Path("data").mkdir(parents=True, exist_ok=True)
-
 # Index page
 @app.route("/")
 @app.route("/index")
@@ -65,7 +63,7 @@ def go():
     if request.method == "POST":
         for key, f in request.files.items():
             if key.startswith("file"):
-                img_path = "data/tmp_img." + f.filename.split(".")[-1]
+                img_path = "static/images/tmp_img." + f.filename.split(".")[-1]
                 f.save(img_path)
                 session["result"] = dog_app.run(img_path)
                 session["img_path"] = img_path

@@ -29,7 +29,6 @@ def parse_args():
     )
     return parser.parse_args()
 
-
 if __name__ == "__main__":
     # Parse arguments
     args = parse_args()
@@ -42,11 +41,9 @@ if __name__ == "__main__":
     if args.net == "scratch":
         model = SimpleNet()
     elif args.net == "vgg16_tf":
-        vgg16 = models.vgg16(pretrained=True)
-        model = VGGTransferLearningNet(vgg16)
+        model = VGGTransferLearningNet(models.vgg16(pretrained=True))
     elif args.net == "resnet50_tf":
-        resnet50 = models.resnet50(pretrained=True)
-        model = ResNetTransferLearningNet(resnet50)
+        model = ResNetTransferLearningNet(models.resnet50(pretrained=True))
 
     # Loss function
     loss_fn = nn.CrossEntropyLoss()

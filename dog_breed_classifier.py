@@ -38,6 +38,7 @@ class DogBreedClassifierPipeline:
         self.valid_rate = valid_rate
 
         # Training parameters
+        self.start_epoch = 0
         self.save_prefix = save_prefix
 
         _, _, self.dog_targets_map = load_dog_dataset(self.data_path / "train")
@@ -109,7 +110,7 @@ class DogBreedClassifierPipeline:
         self.model = self.model.to(device)
         train_loss = 0.0
         min_valid_loss = 999
-        for epoch in range(num_epochs):
+        for epoch in range(self.start_epoch, num_epochs):
             for i, data in enumerate(self.train_loader):
                 # Ensure model is in training mode
                 self.model = self.model.train()
@@ -148,7 +149,9 @@ class DogBreedClassifierPipeline:
                 # Save model
                 if n_iter % self.save_rate == 0 and n_iter != 0:
                     model_save_info = {
+                        "epoch": epoch,
                         "model_state_dict": self.model.state_dict(),
+                        "optimizer_state_dict": optimizer.state_dict(),
                     }
                     timestamp = datetime.now().strftime("%Y_%m_%d_%H%M%S%f")
                     print("Saving model")
@@ -195,7 +198,9 @@ class DogBreedClassifierPipeline:
                             )
                         )
                         model_save_info = {
+                            "epoch": epoch,
                             "model_state_dict": self.model.state_dict(),
+                            "optimizer_state_dict": optimizer.state_dict(),
                         }
                         timestamp = datetime.now().strftime("%Y_%m_%d_%H%M%S%f")
                         print("Saving model")
@@ -246,7 +251,9 @@ class DogBreedClassifierPipeline:
             model_save_postfix = "_best"
 
         model_save_info = {
+            "epoch": epoch,
             "model_state_dict": self.model.state_dict(),
+            "optimizer_state_dict": optimizer.state_dict(),
         }
         timestamp = datetime.now().strftime("%Y_%m_%d_%H%M%S%f")
         print("Saving model")
@@ -263,6 +270,7 @@ class DogBreedClassifierPipeline:
     def load(self, path):
         model_save_info = torch.load(path)
         print("Loading model from checkpoint {}".format(path))
+        self.start_epoch = model_save_info["epoch"] + 1
         self.model.load_state_dict(model_save_info["model_state_dict"])
 
     def evaluate(self, device):

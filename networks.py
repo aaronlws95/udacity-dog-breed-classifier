@@ -9,11 +9,12 @@ class VGGTransferLearningNet(nn.Module):
             model.classifier[6].in_features, num_classes, bias=True
         )
 
-        for param in self.net.parameters():
-            param.requires_grad = False
+        if freeze:
+            for param in self.net.parameters():
+                param.requires_grad = False
 
-        for param in self.net.classifier.parameters():
-            param.requires_grad = True
+            for param in self.net.classifier.parameters():
+                param.requires_grad = True
 
     def forward(self, x):
         x = self.net(x)
@@ -26,11 +27,12 @@ class ResNetTransferLearningNet(nn.Module):
         self.net = model
         self.net.fc = nn.Linear(model.fc.in_features, num_classes, bias=True)
 
-        for param in self.net.parameters():
-            param.requires_grad = False
+        if freeze:
+            for param in self.net.parameters():
+                param.requires_grad = False
 
-        for param in self.net.fc.parameters():
-            param.requires_grad = True
+            for param in self.net.fc.parameters():
+                param.requires_grad = True
 
     def forward(self, x):
         x = self.net(x)
