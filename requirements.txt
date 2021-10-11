@@ -5,3 +5,5 @@ jupyter==1.0.0
 facenet-pytorch==2.5.2
 matplotlib==3.4.3
 opencv-python==4.5.3.56
+flask==2.0.2
+flask-dropzone==1.6.0

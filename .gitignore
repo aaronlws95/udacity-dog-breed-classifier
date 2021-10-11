@@ -2,3 +2,5 @@ data/
 pretrained/models/
 .ipynb_checkpoints/
 __pycache__/
+vgg16_tf_2021_10_10_102658274148_03900_best.pt
+tmp_img.*

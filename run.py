@@ -6,7 +6,7 @@ from flask import Flask, request, render_template, session
 from flask_dropzone import Dropzone
 from utils import detect_dog_imagenet, get_num_faces_haarcascade
 from dog_breed_classifier import DogBreedClassifierPipeline
-from networks import VGGTransferLearningNet
+from networks import SimpleNet, ResNetTransferLearningNet, VGGTransferLearningNet
 from dog_app import DogApp
 
 # Parse arguments
@@ -15,9 +15,16 @@ parser.add_argument(
     "--data_path", type=str, default="data/dogImages", help="Path to dog dataset"
 )
 parser.add_argument(
+    "--net",
+    type=str,
+    default="resnet50_tf",
+    help="Select the network to use",
+    choices=["scratch", "vgg16_tf", "resnet50_tf"],
+)
+parser.add_argument(
     "--model_path",
     type=str,
-    default="pretrained/saved_models/scratch_2021_10_10_111153599424_06600_best.pt",
+    default="pretrained/saved_models/resnet50_tf_2021_10_11_180421188539_06300_best.pt",
     help="Path to saved model",
 )
 args = parser.parse_args()
@@ -36,9 +43,16 @@ app.secret_key = "dog_app"
 # Dog app setup
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print("Using {}".format(device))
-vgg16_dogbreed_net = VGGTransferLearningNet(models.vgg16(pretrained=True)).to(device)
+# Model
+if args.net == "scratch":
+    model = SimpleNet()
+elif args.net == "vgg16_tf":
+    model = VGGTransferLearningNet(models.vgg16(pretrained=True))
+elif args.net == "resnet50_tf":
+    model = ResNetTransferLearningNet(models.resnet50(pretrained=True))
+
 dog_breed_classifier_pipeline = DogBreedClassifierPipeline(
-    data_path=args.data_path, model=vgg16_dogbreed_net
+    data_path=args.data_path, model=model
 )
 dog_breed_classifier_pipeline.load(args.model_path)
 dog_breed_classifier_fn = lambda x: dog_breed_classifier_pipeline.classify(x, device)
