@@ -1,7 +1,7 @@
 # Dog Breed Classifier
 
 ## Project Overview
-In this project, we develop an algorithm that takes in an image and identifies if contains a human or a dog. If it does contain either a human or a dog, a convolutional neural network (CNN) will classify the dog's breed or the resembling dog breed for that human. For our project we use the [Stanford Dogs dataset](https://s3-us-west-1.amazonaws.com/udacity-aind/dog-project/dogImages.zip) to train our dog breed classifier. Additionally, we develop a web application that allows users to upload their own images to be classified by our algorithm. 
+In this project, we develop an algorithm that takes in an image and identifies if contains a human or a dog. If it does contain either a human or a dog, a convolutional neural network (CNN) will classify the dog's breed or the resembling dog breed for that human. For our project we use the [Stanford Dogs dataset](https://s3-us-west-1.amazonaws.com/udacity-aind/dog-project/dogImages.zip) to train our dog breed classifier. Additionally, we develop a web application that allows users to upload their own images to be classified by our algorithm. You can find more details about the process in `dog_app.ipynb`.
 
 This work was carried out as part of the [Udacity Data Scientist Nanodegree](https://www.udacity.com/course/data-scientist-nanodegree--nd025).
 
