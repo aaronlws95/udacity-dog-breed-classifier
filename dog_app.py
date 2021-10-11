@@ -8,25 +8,18 @@ class DogApp:
         self.dog_detector_fn = dog_detector_fn
         self.human_detector_fn = human_detector_fn
 
-    def run(self, img_path, show_img=True):
-        is_human = self.human_detector_fn(img_path)
-        is_dog = self.dog_detector_fn(img_path)
-        _, breed = self.dog_breed_classifier_fn(img_path)
-
-        if show_img:
-            img = Image.open(img_path).convert("RGB")
-            plt.yticks([])
-            plt.xticks([])
-            plt.imshow(img)
-            plt.show()
+    def run(self, img):
+        is_human = self.human_detector_fn(img)
+        is_dog = self.dog_detector_fn(img)
+        _, breed = self.dog_breed_classifier_fn(img)
 
         if is_human and is_dog:
-            print(
-                "Can't tell if human or dog. Either way looks like a {}".format(breed)
+            return "Can't tell if human or dog. Either way looks like a {}".format(
+                breed.replace("_", " ")
             )
         elif is_dog:
-            print("This is a {} dog".format(breed))
+            return "This is a {} dog".format(breed.replace("_", " "))
         elif is_human:
-            print("Not a dog but looks like a {}".format(breed))
+            return "Not a dog but looks like a {}".format(breed.replace("_", " "))
         else:
-            print("Neither dog nor human")
+            return "Neither dog nor human"

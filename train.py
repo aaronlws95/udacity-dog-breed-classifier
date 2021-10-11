@@ -29,6 +29,7 @@ def parse_args():
     )
     return parser.parse_args()
 
+
 if __name__ == "__main__":
     # Parse arguments
     args = parse_args()

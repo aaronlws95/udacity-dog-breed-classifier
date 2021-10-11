@@ -42,6 +42,13 @@ def load_human_dataset(path):
     return human_files
 
 
+def get_num_faces_haarcascade_PIL_img(img, detector):
+    cv_img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
+    gray = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
+    faces = detector.detectMultiScale(gray)
+    return len(faces)
+
+
 def get_num_faces_haarcascade(img_path, detector):
     img = cv2.imread(img_path)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -87,8 +94,7 @@ def visualize_faces_mtcnn(img_path, detector):
         plt.show()
 
 
-def load_image_imagenet(img_path, device):
-    img = Image.open(img_path).convert("RGB")
+def PIL_to_tensor(img, device):
     transform = transforms.Compose(
         [
             transforms.Resize(size=(244, 244)),  # Resize
@@ -100,8 +106,13 @@ def load_image_imagenet(img_path, device):
     return img
 
 
-def detect_dog_imagenet(img_path, model, device):
-    img = load_image_imagenet(img_path, device)
+def detect_dog_imagenet_PIL_img(img, model, device):
+    img = PIL_to_tensor(img, device)
     out = model(img)
     idx = torch.max(out, 1)[1].item()
     return idx >= 151 and idx <= 268
+
+
+def detect_dog_imagenet(img_path, model, device):
+    img = Image.open(img_path).convert("RGB")
+    return detect_dog_imagenet_PIL_img(img, model, device)
