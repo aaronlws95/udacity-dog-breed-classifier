@@ -28,12 +28,12 @@ python train.py --net resnet50_tf # train a ResNet50 model with transfer learnin
 python train.py --net vgg16_tf # train a VGG16 model with transfer learning
 ```
 
-2. Running the web application
+3. Running the web application
 ```
 python run.py --data_path data/dogImages --net resnet50_tf --model_path pretrained/saved_models/resnet50_tf_2021_10_11_180421188539_06300_best.pt
 ```
 
-3. Go to http://0.0.0.0:3001/
+4. Go to http://0.0.0.0:3001/ and upload an image of your choice!
 
 ## Files
 ```
