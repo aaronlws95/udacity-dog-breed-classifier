@@ -1,9 +1,11 @@
 # Dog Breed Classifier
 
 ## Project Overview
-In this project, we develop an algorithm that takes in an image and identifies if contains a human or a dog. If it does contain either a human or a dog, a convolutional neural network (CNN) will classify the dog's breed or the resembling dog breed for that human. For our project we use the [Stanford Dogs dataset](https://s3-us-west-1.amazonaws.com/udacity-aind/dog-project/dogImages.zip) to train our dog breed classifier. Additionally, we develop a web application that allows users to upload their own images to be classified by our algorithm. You can find more details about the process in `dog_app.ipynb`.
+In this project, we develop an algorithm that takes in an image and identifies if it contains a human or a dog. If it does contain either a human or a dog, a convolutional neural network (CNN) will classify the dog's breed or the resembling dog breed for that human. For our project we use the [Stanford Dogs dataset](https://s3-us-west-1.amazonaws.com/udacity-aind/dog-project/dogImages.zip) to train our dog breed classifier. Additionally, we develop a web application that allows users to upload their own images to be classified by our algorithm. You can find more details about the process in `dog_app.ipynb`.
 
 This work was carried out as part of the [Udacity Data Scientist Nanodegree](https://www.udacity.com/course/data-scientist-nanodegree--nd025).
+
+You can find a write-up on this project [here](https://aaronlws.medium.com/dog-breed-classification-app-udacity-dsnd-1a117cd90af9)!
 
 ![Web app screenshot](/media/webapp_screenshot.png?raw=true)
 
@@ -49,7 +51,7 @@ dog-breed-classifier
 │   ├── haarcascades/       # Pretrained data for the Haar Cascade detector
 │   └── saved_models/       # Pretrained machine learning models
 ├── static/images/          # Static images for the web application
-├── templates
+├── templates               # HTML templates for the web application
 │   ├── go.html             # Handle requests for the web application
 │   └── master.html         # Main index for the web application
 ├── dog_app.ipynb           # Exploratory notebook
@@ -70,7 +72,7 @@ dog-breed-classifier
 ## Resources
 * [Labeled Faces in the Wild dataset](http://vis-www.cs.umass.edu/lfw/): [download link](https://s3-us-west-1.amazonaws.com/udacity-aind/dog-project/lfw.zip)
 * [Stanford Dogs dataset](http://vision.stanford.edu/aditya86/ImageNetDogs/): [download link](https://s3-us-west-1.amazonaws.com/udacity-aind/dog-project/dogImages.zip)
-* [OpenCV Haar feature-based cascade classsifier](http://docs.opencv.org/trunk/d7/d8b/tutorial_py_face_detection.html)
+* [OpenCV Haar feature-based cascade classsifier](https://en.wikipedia.org/wiki/Haar-like_feature)
     * [Pretrained detector](https://github.com/opencv/opencv/tree/master/data/haarcascades)
 * [three_people.jpg](https://www.shutterstock.com/image-photo/horizontal-shot-three-mixed-race-teenagers-1238409808)
 * [Face recognition using PyTorch](https://github.com/timesler/facenet-pytorch)
